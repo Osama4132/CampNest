@@ -38,6 +38,16 @@ export default function Register() {
     await doSignInWithEmailAndPassword(email, password);
     console.log("Signed in!");
   };
+
+  const handleForgetPassword = async (e) => {
+    e.preventDefault();
+    const email = 
+  e.target
+  [0].value;
+    doResetPassword(email);
+  }; 
+  
+
   const handleLogout = () => {
     doSignOut();
   };
@@ -66,7 +76,10 @@ export default function Register() {
         <input type="password" name="password" />
         <br />
         <button>Submit</button>
-        <form onSubmit={handleLogin}>
+      
+  </form>
+
+  <form onSubmit={handleLogin}>
   <h1>Login</h1>
   <label htmlFor="email">Email</label>
   <input type="email" name="email" />
@@ -75,8 +88,13 @@ export default function Register() {
   <input type="password" name="password" />
   <br />
   <button>Submit</button>
-</form>;
-      </form>
+</form>
+
+  <form onSubmit={handleForgetPassword}>
+  <label htmlFor="email">email</label>
+  <input type="email" name="email" />
+  <button>Reset Password</button>
+</form>; 
       <div>{user ? <h1>LOGGED IN!</h1> : <h1>NOT LOGGED IN</h1>}</div>
     </>
   );
