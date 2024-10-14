@@ -19,7 +19,22 @@ export const doCreateUserWithEmailAndPassword = async (
 
   return userCredential;
 };
+export const doSignInWithEmailAndPassword = async (
+  email: string,
+  password: string
+) => {
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+  if (!userCredential.user.emailVerified) {
+    doSignOut();
+    throw new Error("Please verify your email before signing in.");
+  }
 
+  return userCredential;
+};
 export const doSignOut = () => {
   return auth.signOut();
 };
