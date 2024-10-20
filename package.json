@@ -23,6 +23,7 @@
     "express": "^4.21.0",
     "firebase": "^10.14.0",
     "firebase-admin": "^12.6.0",
+    "formik": "^2.4.6",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.0",
     "morgan": "^1.10.0",
