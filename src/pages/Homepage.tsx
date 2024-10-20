@@ -15,9 +15,9 @@ export default function HomePage() {
         >
           <header className="mb-auto"></header>
           <main className="px-3">
-            <h1>YelpCamp</h1>
+            <h1>CampNest</h1>
             <p className="lead">
-              Welcome to YelpCamp! <br /> Jump right in and explore our many
+              Welcome to CampNest! <br /> Jump right in and explore our many
               campgrounds. <br />
               Feel free to share some of your own and comment on others!
             </p>

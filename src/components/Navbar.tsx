@@ -10,7 +10,7 @@ export default function Navbar({ styles }: { styles: CSSModuleClasses }) {
       >
         <div className="container-fluid d-flex gap-3 ">
           <Link className="navbar-brand" to="/">
-            Yelpcamp
+          CampNest
           </Link>
           <button
             className="navbar-toggler"
