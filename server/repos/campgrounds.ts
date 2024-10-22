@@ -36,10 +36,12 @@ const campgroundSchema = new Schema(
 
 const Campground = mongoose.model("Campground", campgroundSchema);
 
+const seedAmount = 10
+
 //Placeholder random data for testing purposes
 export async function seedCampgrounds() {
   await Campground.deleteMany({});
-  Array(10)
+  Array(seedAmount)
     .fill(undefined)
     .map(async (_, i) => {
       const random = Math.floor(Math.random() * 1000);
