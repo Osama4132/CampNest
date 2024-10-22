@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.0.3",
     "@types/mongodb": "^4.0.7",
     "@types/mongoose": "^5.11.97",
     "axios": "^1.7.7",
