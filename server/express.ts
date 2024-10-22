@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-
+import {seedCampgrounds} from "./repos/campgrounds.ts"
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
@@ -22,6 +21,9 @@ app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
+
+//Campgrounds deleted and re-seeded everytime the server is started
+seedCampgrounds() 
 
 app.use("/api/campgrounds", campgroundRouter)
 
