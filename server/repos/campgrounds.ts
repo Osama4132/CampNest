@@ -36,7 +36,7 @@ const campgroundSchema = new Schema(
 
 const Campground = mongoose.model("Campground", campgroundSchema);
 
-const seedAmount = 10
+const seedAmount = 10;
 
 //Placeholder random data for testing purposes
 export async function seedCampgrounds() {
@@ -77,4 +77,14 @@ export async function seedCampgrounds() {
       await newCampground.save();
     });
 }
-seedCampgrounds();
+
+async function findAllCampgrounds() {
+  const campgrounds = await Campground.find({});
+  return campgrounds;
+}
+
+const campgroundModel = {
+  findAllCampgrounds
+}
+
+export default campgroundModel 
