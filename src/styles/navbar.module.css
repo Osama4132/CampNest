@@ -1,7 +1,8 @@
 .navbar {
-  width: 95vw;
+  width: 100vw;
   position: absolute;
   color: white;
+  padding-right: 16px;
 }
 
 .navLink {
