@@ -5,7 +5,7 @@ export default function Navbar({ styles }: { styles?: CSSModuleClasses }) {
   return (
     <>
       <nav
-        className={`${styles?.navbar}  navbar sticky-top navbar-expand-lg bg-body-tertiary mt-3`}
+        className={`${styles?.navbar} navbar sticky-top navbar-expand-lg bg-body-tertiary`}
         data-bs-theme="dark"
       >
         <div className="container-fluid d-flex gap-3 ">

@@ -36,7 +36,7 @@ const campgroundSchema = new Schema(
 
 const Campground = mongoose.model("Campground", campgroundSchema);
 
-const seedAmount = 10;
+const seedAmount = 100;
 
 //Placeholder random data for testing purposes
 export async function seedCampgrounds() {
@@ -78,13 +78,22 @@ export async function seedCampgrounds() {
     });
 }
 
-async function findAllCampgrounds() {
-  const campgrounds = await Campground.find({});
-  return campgrounds;
+//If no produtsPerPage is provided, return all campgrounds
+async function findAllCampgrounds(
+  page: number = 1,
+  productsPerPage: number = 0
+) {
+  const campgrounds = await Campground.find({})
+    .skip((page - 1) * productsPerPage)
+    .limit(productsPerPage);
+
+  const campgroundsCount = await Campground.find({}).countDocuments();
+  const queryData = { campgrounds: campgrounds, count: campgroundsCount };
+  return queryData;
 }
 
 const campgroundModel = {
-  findAllCampgrounds
-}
+  findAllCampgrounds,
+};
 
-export default campgroundModel 
+export default campgroundModel;
