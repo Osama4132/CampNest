@@ -34,6 +34,10 @@ const campgroundSchema = new Schema(
   opts
 );
 
+campgroundSchema.virtual("properties.popUpMarkup").get(function () {
+  return `<strong><a href=# id="navigate-link" data-id=${this._id}>${this.title}</a></strong>`;
+});
+
 const Campground = mongoose.model("Campground", campgroundSchema);
 
 const seedAmount = 100;
