@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { faker } from "@faker-js/faker";
 import cities from "../../src/seeds/cities.ts";
+import ExpressError from "../../src/util/ExpressError.ts";
 
 const opts = { toJSON: { virtuals: true } };
 
@@ -92,8 +93,18 @@ async function findAllCampgrounds(
   return queryData;
 }
 
+async function findCampgroundById(id: string) {
+  try {
+    const campground = await Campground.findById(id);
+    return campground;
+  } catch (e) {
+    throw new ExpressError(`Database Error: ${e}`, 404);
+  }
+}
+
 const campgroundModel = {
   findAllCampgrounds,
+  findCampgroundById,
 };
 
 export default campgroundModel;
