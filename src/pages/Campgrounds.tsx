@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import CampgroundCard from "../components/CampgroundCard";
 import styles from "../styles/navbar.module.css";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import ClusterMap from "../components/Clustermap";
@@ -19,9 +19,19 @@ export default function Newcampground() {
 
   const productsPerPage = 16;
 
-  const fetchpaginatedCampgrounds = async () => {
+  const searchRef = useRef("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPageCount(1);
+    fetchPaginatedCampgrounds();
+  };
+
+  const fetchPaginatedCampgrounds = async () => {
+    const searchQuery = searchRef.current;
     const info = await axios.get(
-      `/api/campgrounds?page=${pageCount}&productsPerPage=${productsPerPage}`
+      `/api/campgrounds?page=${pageCount}&productsPerPage=${productsPerPage}`,
+      { params: { searchQuery } }
     );
     setPaginatedCampgrounds(info.data);
     setIsLoading(false);
@@ -46,7 +56,7 @@ export default function Newcampground() {
 
   useEffect(() => {
     setPageNumInURL();
-    fetchpaginatedCampgrounds();
+    fetchPaginatedCampgrounds();
     fetchAllCampgrounds();
   }, [setPageNumInURL]);
   return (
@@ -63,30 +73,48 @@ export default function Newcampground() {
                   <ClusterMap
                     campgrounds={allCampgrounds.campgrounds}
                   ></ClusterMap>
-                  <div className={`container d-flex flex-column mt-5 `}>
-                    <h1 className={`text-center my-4 `}>All Campgrounds:</h1>
-                    <div className="container d-flex mb-3 flex-wrap align-items-start justify-content-center gap-4">
-                      {paginatedCampgrounds.campgrounds.length > 0 ? (
-                        paginatedCampgrounds.campgrounds.map((campground) => (
-                          <CampgroundCard
-                            key={campground._id}
-                            campground={campground}
-                          />
-                        ))
-                      ) : (
-                        <p>No campgrounds available</p>
-                      )}
-                    </div>
-                  </div>
-                  {Object.keys(paginatedCampgrounds).length === 0 || (
-                    <Pagination
-                      onPageChange={onPageChange}
-                      currentPageCount={pageCount}
-                      campgroundsCount={paginatedCampgrounds.count}
-                      productsPerPage={productsPerPage}
-                    />
-                  )}
                 </div>
+                <div className={`container col-12 col-md-6 mt-5 text-center `}>
+                  <form
+                    className="shadow-sm"
+                    role="search"
+                    onSubmit={handleSearch}
+                    onChange={(e) => (searchRef.current = e.target.value)}
+                  >
+                    <div className="d-flex">
+                      <input
+                        className={`${styles.searchBar} form-control rounded`}
+                        type="search"
+                        placeholder="Search..."
+                        aria-label="Search"
+                        name="search"
+                      />
+                    </div>
+                  </form>
+                </div>
+                <div className={`container d-flex flex-column mt-5 `}>
+                  <h1 className={`text-center my-4 `}>All Campgrounds:</h1>
+                  <div className="container d-flex mb-3 flex-wrap align-items-start justify-content-center gap-4">
+                    {paginatedCampgrounds.campgrounds.length > 0 ? (
+                      paginatedCampgrounds.campgrounds.map((campground) => (
+                        <CampgroundCard
+                          key={campground._id}
+                          campground={campground}
+                        />
+                      ))
+                    ) : (
+                      <p>No campgrounds available</p>
+                    )}
+                  </div>
+                </div>
+                {Object.keys(paginatedCampgrounds).length === 0 || (
+                  <Pagination
+                    onPageChange={onPageChange}
+                    currentPageCount={pageCount}
+                    campgroundsCount={paginatedCampgrounds.count}
+                    productsPerPage={productsPerPage}
+                  />
+                )}
               </>
             ) : (
               <p>Loading Campgrounds...</p>
