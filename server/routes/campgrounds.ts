@@ -1,12 +1,16 @@
 import express from "express";
-import { showAllCampgrounds } from "../controllers/campgrounds.ts";
-
+import {
+  showAllCampgrounds,
+  showCampgroundDetails,
+} from "../controllers/campgrounds.ts";
 
 const router = express.Router();
 router.get("/test", (req, res) => {
-    res.json({message: "Message recieved!"})
+  res.json({ message: "Message recieved!" });
 });
 
-router.get("/", showAllCampgrounds)
+router.get("/", showAllCampgrounds);
 
-export default router
+router.get("/:id", showCampgroundDetails);
+
+export default router;
