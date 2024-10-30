@@ -35,6 +35,10 @@ const campgroundSchema = new Schema(
   opts
 );
 
+campgroundSchema.virtual("properties.popUpMarkup").get(function () {
+  return `<strong><a href=# id="navigate-link" data-id=${this._id}>${this.title}</a></strong>`;
+});
+
 const Campground = mongoose.model("Campground", campgroundSchema);
 
 const seedAmount = 100;
@@ -82,13 +86,25 @@ export async function seedCampgrounds() {
 //If no produtsPerPage is provided, return all campgrounds
 async function findAllCampgrounds(
   page: number = 1,
-  productsPerPage: number = 0
+  productsPerPage: number = 0,
+  searchQuery: string = ""
 ) {
-  const campgrounds = await Campground.find({})
+  const query: {
+    $or?: Array<{ title?: { $regex: RegExp }; location?: { $regex: RegExp } }>;
+  } = {};
+
+  if (searchQuery) {
+    query.$or = [
+      { title: { $regex: new RegExp(searchQuery, "i") } },
+      { location: { $regex: new RegExp(searchQuery, "i") } },
+    ];
+  }
+
+  const campgrounds = await Campground.find(query)
     .skip((page - 1) * productsPerPage)
     .limit(productsPerPage);
 
-  const campgroundsCount = await Campground.find({}).countDocuments();
+  const campgroundsCount = await Campground.find(query).countDocuments();
   const queryData = { campgrounds: campgrounds, count: campgroundsCount };
   return queryData;
 }
