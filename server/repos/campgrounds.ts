@@ -111,16 +111,27 @@ async function findAllCampgrounds(
 
 async function findCampgroundById(id: string) {
   try {
-    const campground = await Campground.findById(id);
+    const campground = await Campground.findById(id).populate("reviews");
     return campground;
   } catch (e) {
     throw new ExpressError(`Database Error: ${e}`, 404);
   }
 }
 
+export async function deleteReviewInCampground(
+  campgroundid: string,
+  reviewid: string
+) {
+  await Campground.findOneAndUpdate(
+    { _id: campgroundid },
+    { $pull: { reviews: reviewid } }
+  );
+}
+
 const campgroundModel = {
   findAllCampgrounds,
   findCampgroundById,
+  deleteReviewInCampground,
 };
 
 export default campgroundModel;
