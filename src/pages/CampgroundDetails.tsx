@@ -43,6 +43,13 @@ export default function CampgroundDetails() {
     }
   };
 
+  const deleteCampground = async () => {
+    const response = await axios.delete(`/api/campgrounds/${id}`);
+    if (response.status === 200) {
+      navigate("/campgrounds");
+    }
+  };
+
   const getCampground = useCallback(async () => {
     try {
       const response = await axios.get(`/api/campgrounds/${id}`);
@@ -145,7 +152,7 @@ export default function CampgroundDetails() {
                         </Link>
                       </div>
                       <div className="d-flex">
-                        <button className="btn btn-danger">
+                        <button className="btn btn-danger" onClick={deleteCampground}>
                           Delete Campground
                         </button>
                       </div>

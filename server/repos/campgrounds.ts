@@ -2,6 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { faker } from "@faker-js/faker";
 import cities from "../../src/seeds/cities.ts";
 import ExpressError from "../../src/util/ExpressError.ts";
+import Review from "./reviews.ts"
 
 const opts = { toJSON: { virtuals: true } };
 
@@ -37,6 +38,12 @@ const campgroundSchema = new Schema(
 
 campgroundSchema.virtual("properties.popUpMarkup").get(function () {
   return `<strong><a href=# id="navigate-link" data-id=${this._id}>${this.title}</a></strong>`;
+});
+
+campgroundSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) {
+    await Review.deleteMany({ _id: { $in: doc.reviews } });
+  }
 });
 
 const Campground = mongoose.model("Campground", campgroundSchema);
@@ -118,6 +125,12 @@ async function findCampgroundById(id: string) {
   }
 }
 
+async function deleteCampgroundById(id: string) {
+  const campground = await findCampgroundById(id);
+  if (!campground) throw new ExpressError("Campground not found", 500);
+  await Campground.findByIdAndDelete({ _id: id });
+}
+
 export async function deleteReviewInCampground(
   campgroundid: string,
   reviewid: string
@@ -132,6 +145,7 @@ const campgroundModel = {
   findAllCampgrounds,
   findCampgroundById,
   deleteReviewInCampground,
+  deleteCampgroundById,
 };
 
 export default campgroundModel;

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import model from "../repos/campgrounds.ts";
-import ExpressErrorGeneric from "../../src/util/ExpressErrorGeneric.ts"
+import ExpressErrorGeneric from "../../src/util/ExpressErrorGeneric.ts";
 
 export const showAllCampgrounds = async (req: Request, res: Response) => {
   const page = req.query.page ? Number(req.query.page) : 1;
@@ -12,7 +12,11 @@ export const showAllCampgrounds = async (req: Request, res: Response) => {
     ? String(req.query.searchQuery)
     : "";
 
-  const campgrounds = await model.findAllCampgrounds(page, productsPerPage, searchQuery);
+  const campgrounds = await model.findAllCampgrounds(
+    page,
+    productsPerPage,
+    searchQuery
+  );
   if (!campgrounds) {
     res.status(404).json({ message: "Campgrounds not found" });
     return;
@@ -26,9 +30,20 @@ export const showCampgroundDetails = async (req: Request, res: Response) => {
     const campground = await model.findCampgroundById(id);
     if (!campground) {
       res.status(404).json({ message: "Campground not found" });
-      return
+      return;
     }
     res.json(campground);
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
+};
+
+export const deleteCampground = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await model.deleteCampgroundById(id);
+     res.status(200).json({ message: `Campground ID ${id} Deleted.` });
+     return
   } catch (e) {
     ExpressErrorGeneric(res, e);
   }
