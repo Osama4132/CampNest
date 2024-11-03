@@ -10,6 +10,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/maps.css";
 import styles from "../styles/navbar.module.css";
 import { useFormik } from "formik";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const mapboxEnv = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -18,6 +20,9 @@ export default function CampgroundDetails() {
 
   const mapRef = useRef<mapboxgl.Map>();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -30,6 +35,17 @@ export default function CampgroundDetails() {
       errors.review = "Must be greater than 10 characters";
     }
     return errors;
+  };
+
+  const submitBooking = async () => {
+    try {
+      const response = await axios.post(`/api/booking/${id}`, {
+        startDate: startDate,
+        endDate: endDate,
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleDeleteReview = async (reviewid: string) => {
@@ -117,7 +133,7 @@ export default function CampgroundDetails() {
       <div>
         <Navbar styles={styles} />
         {campground && (
-          <main>
+          <main style={{ marginTop: "4em" }}>
             <div className="row mx-2 my-2 mx-md-5 my-md-3 ">
               <div className=" col-lg-6 mt-3">
                 <Carousel
@@ -152,7 +168,10 @@ export default function CampgroundDetails() {
                         </Link>
                       </div>
                       <div className="d-flex">
-                        <button className="btn btn-danger" onClick={deleteCampground}>
+                        <button
+                          className="btn btn-danger"
+                          onClick={deleteCampground}
+                        >
                           Delete Campground
                         </button>
                       </div>
@@ -166,9 +185,42 @@ export default function CampgroundDetails() {
                   ref={mapContainerRef}
                   className="mb-3"
                 />
+                <div
+                  className={`gap-3 p-3 col-lg-12 d-flex flex-column `}
+                  style={{ backgroundColor: "#f5f5dccf" }}
+                >
+                  <div className={`row col-12 text-center `}>
+                    <h2>Book Campground?</h2>
+                  </div>
+                  <div className="row">
+                    <div className="col-6 d-flex flex-column align-items-center">
+                      <h4 className={`p-0 mb-2 `}>Start date:</h4>
+                      <DatePicker
+                        showIcon
+                        toggleCalendarOnIconClick
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                      />
+                    </div>
+                    <div className="col-6 d-flex flex-column align-items-center">
+                      <h4 className={`p-0 mb-2 `}>End date:</h4>
+                      <DatePicker
+                        showIcon
+                        toggleCalendarOnIconClick
+                        selected={endDate}
+                        onChange={(date) => setEndDate(date)}
+                      />
+                    </div>
+                    <div className="mt-5 d-flex col-12 justify-content-center">
+                      <button onClick={submitBooking} className={`btn `}>
+                        Book Campground
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className={`${styles.reviewWrapper} p-3 mt-3`}>
-                <h2 className={`${styles.reviewHeader}`}>Reviews:</h2>
+              <div className={` p-3 mt-3`} style={{backgroundColor: "#00000011"}}>
+                <h2>Reviews:</h2>
 
                 <form onSubmit={formik.handleSubmit} className="mb-3">
                   <div className="mb-3">
@@ -236,14 +288,11 @@ export default function CampgroundDetails() {
                   </div>
 
                   <div className="mb-3">
-                    <label
-                      className={`form-label fs-4 ${styles.reviewHeader}`}
-                      htmlFor="review"
-                    >
+                    <label className={`form-label fs-4 `} htmlFor="review">
                       Review
                     </label>
                     <textarea
-                      className={`form-control ${styles.reviewTextarea} `}
+                      className={`form-control  `}
                       rows={5}
                       name="review"
                       id="review"
@@ -261,22 +310,15 @@ export default function CampgroundDetails() {
                 </form>
                 {campground.reviews.length === 0 && (
                   <>
-                    <h3 className={`text-center ${styles.noReviewHeader}`}>
-                      No reviews
-                    </h3>
-                    <h5 className={`text-center ${styles.noReviewHeader}`}>
-                      Be the first to review!
-                    </h5>
+                    <h3 className={`text-center `}>No reviews</h3>
+                    <h5 className={`text-center `}>Be the first to review!</h5>
                   </>
                 )}
 
                 {Object.keys(campground).length === 0 ||
                   campground.reviews.map((review) => (
-                    <div
-                      className={`mb-3 card ${styles.userReview}`}
-                      key={review._id}
-                    >
-                      <div className={`card-body ${styles.userReviewTitle}`}>
+                    <div className={`mb-3 card `} key={review._id}>
+                      <div className={`card-body `}>
                         <h5>Rating: {review.rating}</h5>
 
                         <p
@@ -285,12 +327,10 @@ export default function CampgroundDetails() {
                         >
                           Rated: 3
                         </p>
-                        <pre className={` ${styles.userReviewContent}`}>
-                          {review.review}
-                        </pre>
+                        <pre className={` `}>{review.review}</pre>
                         <button
                           onClick={() => handleDeleteReview(review._id)}
-                          className={`btn btn-sm btn-danger ${styles.reviewDeleteButton}`}
+                          className={`btn btn-sm btn-danger `}
                         >
                           Delete
                         </button>

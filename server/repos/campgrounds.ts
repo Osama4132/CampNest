@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { faker } from "@faker-js/faker";
 import cities from "../../src/seeds/cities.ts";
 import ExpressError from "../../src/util/ExpressError.ts";
-import Review from "./reviews.ts"
+import Review from "./reviews.ts";
 
 const opts = { toJSON: { virtuals: true } };
 
@@ -30,6 +30,12 @@ const campgroundSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "Review",
+      },
+    ],
+    bookings: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Booking",
       },
     ],
   },
@@ -118,7 +124,9 @@ async function findAllCampgrounds(
 
 async function findCampgroundById(id: string) {
   try {
-    const campground = await Campground.findById(id).populate("reviews");
+    const campground = await Campground.findById(id)
+      .populate("reviews")
+      .populate("bookings");
     return campground;
   } catch (e) {
     throw new ExpressError(`Database Error: ${e}`, 404);
