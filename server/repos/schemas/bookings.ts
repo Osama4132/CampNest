@@ -55,11 +55,7 @@ function IsBookingAvailable(
   newStartDate: number,
   newEndDate: number
 ) {
-  console.log("oldStartDate:", oldStartDate);
-  console.log("oldEndDate:", oldEndDate);
-  console.log("newStartDate:", newStartDate);
-  console.log("newEndDate:", newEndDate);
-
+  
   if (
     newStartDate === oldStartDate ||
     newStartDate === oldEndDate ||

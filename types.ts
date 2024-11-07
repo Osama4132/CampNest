@@ -3,6 +3,13 @@ export type Geometry = {
   coordinates: number[];
 };
 
+export type Author = {
+  _id: string,
+  id: string,
+  username: string,
+  email: string
+}
+
 export type Campground = {
   _id: string;
   title: string;
@@ -10,5 +17,6 @@ export type Campground = {
   description: string;
   location: string;
   geometry: Geometry;
+  author: Author
   properties?: { popUpMarkup: string };
 };

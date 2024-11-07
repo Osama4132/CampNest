@@ -7,6 +7,7 @@ import morgan from "morgan";
 import campgroundRouter from "./routes/campgrounds.ts"
 import reviewRouter from "./routes/reviews.ts"
 import bookingRouter from "./routes/bookings.ts"
+import userRouter from "./routes/users.ts"
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -30,6 +31,7 @@ seedCampgrounds()
 app.use("/api/campgrounds", campgroundRouter)
 app.use("/api/booking", bookingRouter)
 app.use("/api/campgrounds/:id/review", reviewRouter);
+app.use("/api/user", userRouter)
 
 
 app.listen(PORT, () => {

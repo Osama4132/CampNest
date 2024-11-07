@@ -7,8 +7,11 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import ClusterMap from "../components/Clustermap";
+import { useUser } from "../contexts/UserProvider";
 
 export default function Newcampground() {
+  const { user } = useUser();
+
   const [paginatedCampgrounds, setPaginatedCampgrounds] = useState(null);
   const [allCampgrounds, setAllCampgrounds] = useState("");
   const [isloading, setIsLoading] = useState(true);
@@ -27,7 +30,7 @@ export default function Newcampground() {
     fetchPaginatedCampgrounds();
   };
 
-  const fetchPaginatedCampgrounds = async () => {
+  const fetchPaginatedCampgrounds = useCallback(async () => {
     const searchQuery = searchRef.current;
     const info = await axios.get(
       `/api/campgrounds?page=${pageCount}&productsPerPage=${productsPerPage}`,
@@ -35,7 +38,7 @@ export default function Newcampground() {
     );
     setPaginatedCampgrounds(info.data);
     setIsLoading(false);
-  };
+  }, [pageCount]);
 
   const setPageNumInURL = useCallback(() => {
     setSearchParams({ page: `${pageCount}` });
@@ -58,7 +61,8 @@ export default function Newcampground() {
     setPageNumInURL();
     fetchPaginatedCampgrounds();
     fetchAllCampgrounds();
-  }, [setPageNumInURL]);
+  }, [setPageNumInURL, fetchAllCampgrounds, fetchPaginatedCampgrounds]);
+
   return (
     <>
       {isloading === true ? (
@@ -69,7 +73,10 @@ export default function Newcampground() {
           <main className={`mt-3 `}>
             {paginatedCampgrounds && allCampgrounds ? (
               <>
-                <div className="d-flex flex-column col-10 offset-1">
+                <div
+                  className="d-flex flex-column col-10 offset-1"
+                  style={{ marginTop: "4em" }}
+                >
                   <ClusterMap
                     campgrounds={allCampgrounds.campgrounds}
                   ></ClusterMap>

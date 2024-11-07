@@ -68,6 +68,7 @@ export async function seedCampgrounds() {
         title: `Title${i}`,
         location: `${cities[random].city}, ${cities[random].state}`,
         description: `${faker.company.catchPhraseDescriptor()}, ${faker.animal.bear()}`,
+        author: "672be9ae17b8c74e528497b3",
         images: [
           {
             url: `https://picsum.photos/900?random=${Math.random()}`,
@@ -114,6 +115,7 @@ async function findAllCampgrounds(
   }
 
   const campgrounds = await Campground.find(query)
+    .populate("author")
     .skip((page - 1) * productsPerPage)
     .limit(productsPerPage);
 
@@ -126,7 +128,8 @@ async function findCampgroundById(id: string) {
   try {
     const campground = await Campground.findById(id)
       .populate("reviews")
-      .populate("bookings");
+      .populate("bookings")
+      .populate("author");
     return campground;
   } catch (e) {
     throw new ExpressError(`Database Error: ${e}`, 404);
