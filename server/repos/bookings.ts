@@ -19,6 +19,10 @@ const bookingSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Campground",
   },
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  }
 });
 
 export const Booking = mongoose.model("Booking", bookingSchema);

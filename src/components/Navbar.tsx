@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useUser } from "../contexts/UserProvider";
 export default function Navbar({ styles }: { styles?: CSSModuleClasses }) {
-  const { user } = useUser();
+  const { user, removeUser } = useUser();
   return (
     <>
       <nav
@@ -10,7 +10,7 @@ export default function Navbar({ styles }: { styles?: CSSModuleClasses }) {
       >
         <div className="container-fluid d-flex gap-3 ">
           <Link className="navbar-brand" to="/">
-          CampNest
+            CampNest
           </Link>
           <button
             className="navbar-toggler"
@@ -71,8 +71,17 @@ export default function Navbar({ styles }: { styles?: CSSModuleClasses }) {
             ) : (
               <ul className={`navbar-nav ${styles?.navbarNav}`}>
                 <li className={`nav-item ${styles?.navItem}`}>
-                  <Link to="/login" className={`${styles?.navLink} active`}>
+                  <Link
+                    onClick={removeUser}
+                    to="/campgrounds"
+                    className={`${styles?.navLink} active`}
+                  >
                     Logout
+                  </Link>
+                </li>
+                <li className={`nav-item ${styles?.navItem}`}>
+                  <Link to="/profile" className={`${styles?.navLink} active`}>
+                    Profile
                   </Link>
                 </li>
               </ul>

@@ -1,6 +1,7 @@
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { doCreateUserWithEmailAndPassword } from "../firebase/auth";
+import axios from "axios";
 
 interface IFormikValues {
   username: string;
@@ -12,21 +13,24 @@ const validate = (values: IFormikValues) => {
   const errors = {} as Partial<IFormikValues>;
   if (!values.username) {
     errors.username = "Required";
-  } else if (values.username.length >= 10) {
-    errors.username = "Must be less than 10 characters";
   }
+  //  else if (values.username.length >= 0) {
+  //   errors.username = "Must be less than 10 characters";
+  // }
 
   if (!values.password) {
     errors.password = "Required";
-  } else if (values.password.length >= 10) {
-    errors.password = "Must be less than 10 characters";
   }
+  // else if (values.password.length >= 0) {
+  //   errors.password = "Must be less than 10 characters";
+  // }
 
   if (!values.email) {
     errors.email = "Required";
-  } else if (values.email.length >= 30) {
-    errors.email = "Must be less than 30 characters";
   }
+  // else if (values.email.length >= 0) {
+  //   errors.email = "Must be less than 30 characters";
+  // }
 
   return errors;
 };
@@ -43,14 +47,21 @@ export default function Register() {
     validate,
     onSubmit: async (values) => {
       try {
-        //@ts-expect-error Username will be use to create user instance with Mongoose
-        const { email, password, username } = values;
+        const { email, password } = values;
 
         const response = await doCreateUserWithEmailAndPassword(
           email,
           password
         );
-        if (response) navigate("/login");
+        console.log(response);
+        if (response) {
+          const newValues = { ...values, id: response.user.uid };
+          const axiosResponse = await axios.post(
+            "/api/user/register",
+            newValues
+          );
+          navigate("/login");
+        }
       } catch (e) {
         throw new Error(`Error with the message: ${e}`);
       }
@@ -120,6 +131,14 @@ export default function Register() {
                   {formik.touched.email && formik.errors.email ? (
                     <div style={{ color: "red" }}>{formik.errors.email}</div>
                   ) : null}
+                </div>
+                <div className="d-flex justify-content-between">
+                  <Link to="/">
+                    <p>Home page</p>
+                  </Link>
+                  <Link to="/Login">
+                    <p>Already Registered?</p>
+                  </Link>
                 </div>
                 <div className="d-grid">
                   <button type="submit" className="btn btn-success">

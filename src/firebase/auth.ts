@@ -6,6 +6,11 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 
+const actionCodeSettings = {
+  url: "http://localhost:5173/campgrounds",
+  handleCodeInApp: true,
+};
+
 export const doCreateUserWithEmailAndPassword = async (
   email: string,
   password: string
@@ -40,7 +45,7 @@ export const doSignInWithEmailAndPassword = async (
 };
 
 export const doResetPassword = async (email: string) => {
-  await sendPasswordResetEmail(auth, email);
+  await sendPasswordResetEmail(auth, email, actionCodeSettings);
 };
 
 export const doSignOut = () => {

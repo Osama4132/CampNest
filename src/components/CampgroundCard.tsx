@@ -25,7 +25,9 @@ export default function CampgroundCard({ campground }) {
               <h5 className={`card-title mt-2 text-truncate`}>
                 {campground.title}
               </h5>
-
+              <p className={`card-text my-0 text-truncate `}>
+                <em> By: {campground.author.username}</em>
+              </p>
               <p className={`card-text my-0 text-truncate $`}>
                 Location: {campground.location}
               </p>

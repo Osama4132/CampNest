@@ -1,8 +1,7 @@
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
-import {
-  doSignInWithEmailAndPassword,
-} from "../firebase/auth";
+import { useNavigate, Link } from "react-router-dom";
+import { doSignInWithEmailAndPassword } from "../firebase/auth";
+import { useUser } from "../contexts/UserProvider";
 
 interface IFormikValues {
   email: string;
@@ -13,21 +12,24 @@ const validate = (values: IFormikValues) => {
   const errors = {} as Partial<IFormikValues>;
   if (!values.email) {
     errors.email = "Required";
-  } else if (values.email.length >= 1) {
-    errors.email = "Must be less than 1 characters";
   }
+  // else if (values.email.length >= 1) {
+  //   errors.email = "Must be less than 1 characters";
+  // }
 
   if (!values.password) {
     errors.password = "Required";
-  } else if (values.password.length >= 6) {
-    errors.password = "Must be greater than 6 characters";
   }
+  //  else if (values.password.length >= 6) {
+  //   errors.password = "Must be greater than 6 characters";
+  // }
 
   return errors;
 };
 
 export default function Register() {
   const navigate = useNavigate();
+  const { getUser } = useUser();
 
   const formik = useFormik({
     initialValues: {
@@ -39,7 +41,10 @@ export default function Register() {
       try {
         const { email, password } = values;
         const response = await doSignInWithEmailAndPassword(email, password);
-        if (response) navigate("/")
+        if (response) {
+          getUser(response.user.uid);
+          navigate("/campgrounds");
+        }
       } catch (e) {
         throw new Error(`Error with the message: ${e}`);
       }
@@ -61,7 +66,7 @@ export default function Register() {
               <form onSubmit={formik.handleSubmit}>
                 <div className="my-3">
                   <label className="form-label" htmlFor="email">
-                    email
+                    Email
                   </label>
                   <input
                     className="form-control"
@@ -94,8 +99,14 @@ export default function Register() {
                     <div style={{ color: "red" }}>{formik.errors.password}</div>
                   ) : null}
                 </div>
-                {/* Implement page for it later. Someone can pick up this task
-                <p onClick={doResetPassword}>Forgot password</p>*/}
+                <div className="d-flex justify-content-between">
+                  <Link to="/">
+                    <p className="text-end">Home page</p>
+                  </Link>
+                  <Link to="/ForgotPassword">
+                    <p className="text-end">Forgot Password?</p>
+                  </Link>
+                </div>
                 <div className="d-grid">
                   <button type="submit" className="btn btn-success">
                     Login

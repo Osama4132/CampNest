@@ -12,10 +12,13 @@ import styles from "../styles/navbar.module.css";
 import { useFormik } from "formik";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useUser } from "../contexts/UserProvider.tsx";
 
 const mapboxEnv = import.meta.env.VITE_MAPBOX_TOKEN;
 
 export default function CampgroundDetails() {
+  const { user } = useUser();
+
   const [campground, setCampground] = useState(null);
 
   const mapRef = useRef<mapboxgl.Map>();
@@ -152,30 +155,33 @@ export default function CampgroundDetails() {
                       <li className={`list-group-item `}>
                         Location: {campground.location}
                       </li>
-                      <li className={`list-group-item  `}>Created by: N/A</li>
+                      <li className={`list-group-item  `}>
+                        Created by: {campground.author.username}
+                      </li>
                       <li className={`list-group-item  `}>
                         Price: ${campground.price}/night
                       </li>
                     </ul>
-
-                    <div className="card-body p-3 d-flex gap-5 justify-content-center ">
-                      <div className="d-flex">
-                        <Link
-                          to={`/campground/${id}/edit`}
-                          className={`btn btn-info card-link `}
-                        >
-                          Edit Campground
-                        </Link>
+                    {user === campground.author.id && (
+                      <div className="card-body p-3 d-flex gap-5 justify-content-center ">
+                        <div className="d-flex">
+                          <Link
+                            to={`/campground/${id}/edit`}
+                            className={`btn btn-info card-link `}
+                          >
+                            Edit Campground
+                          </Link>
+                        </div>
+                        <div className="d-flex">
+                          <button
+                            className="btn btn-danger"
+                            onClick={deleteCampground}
+                          >
+                            Delete Campground
+                          </button>
+                        </div>
                       </div>
-                      <div className="d-flex">
-                        <button
-                          className="btn btn-danger"
-                          onClick={deleteCampground}
-                        >
-                          Delete Campground
-                        </button>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -219,7 +225,10 @@ export default function CampgroundDetails() {
                   </div>
                 </div>
               </div>
-              <div className={` p-3 mt-3`} style={{backgroundColor: "#00000011"}}>
+              <div
+                className={` p-3 mt-3`}
+                style={{ backgroundColor: "#00000011" }}
+              >
                 <h2>Reviews:</h2>
 
                 <form onSubmit={formik.handleSubmit} className="mb-3">
