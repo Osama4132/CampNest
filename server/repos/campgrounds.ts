@@ -2,7 +2,9 @@ import mongoose, { Schema } from "mongoose";
 import { faker } from "@faker-js/faker";
 import cities from "../../src/seeds/cities.ts";
 import ExpressError from "../../src/util/ExpressError.ts";
+import cloudinary from "../../src/cloudinary/cloudinary.ts";
 import Review from "./reviews.ts";
+import { clearCache } from "../controllers/campgrounds.ts";
 
 interface IImages {
   filename: string;
@@ -64,6 +66,7 @@ const seedAmount = 100;
 //Placeholder random data for testing purposes
 export async function seedCampgrounds() {
   await Campground.deleteMany({});
+  clearCache()
   Array(seedAmount)
     .fill(undefined)
     .map(async (_, i) => {
@@ -170,9 +173,12 @@ async function findCampgroundById(id: string) {
   }
 }
 
-async function deleteCampgroundById(id: string) {
+async function deleteCampgroundById(id: string, userId: string) {
   const campground = await findCampgroundById(id);
   if (!campground) throw new ExpressError("Campground not found", 500);
+  if (!campground.author?.equals(userId)) {
+    throw new ExpressError("You are not the author of this campground", 403);
+  }
   await Campground.findByIdAndDelete({ _id: id });
 }
 
@@ -186,12 +192,71 @@ export async function deleteReviewInCampground(
   );
 }
 
+async function editCampground(
+  geometry: { coordinates: number[] },
+  campgroundId: string,
+  location: string,
+  description: string,
+  price: string,
+  title: string,
+  images: IImages[],
+  userid: string,
+  deleteImages: string[]
+) {
+  try {
+    const campground = await findCampgroundById(campgroundId);
+    if (!campground) throw new ExpressError("Campground not found", 500);
+    if (!campground.author?.equals(userid)) {
+      throw new ExpressError("You are not the author of this campground", 403);
+    }
+
+    const update = {
+      geometry: { type: "Point", ...geometry },
+      location: location,
+      description: description,
+      price: price,
+      title: title,
+    };
+
+    await Campground.findOneAndUpdate({ _id: campgroundId }, update, {
+      new: true,
+    });
+    //@ts-ignore
+    campground.images = [...campground.images, ...images];
+    await campground.save();
+    if (deleteImages) {
+      if (deleteImages.length !== 0) {
+        deleteImages.map(async (filename) => {
+          //If placeholdeer image (no filename in cloud), pull img from db based on url
+          //filename being passed will either be url (if placeholder) or cloud filename (if uploaded by user)
+          if (filename.startsWith("http")) {
+            await Campground.updateOne(
+              { _id: campgroundId },
+              { $pull: { images: { url: { $in: filename } } } }
+            );
+            return;
+          }
+          await cloudinary.cloudinary.uploader.destroy(filename);
+        });
+        await Campground.updateOne(
+          { _id: campgroundId },
+          { $pull: { images: { filename: { $in: deleteImages } } } }
+        );
+      }
+    }
+    return;
+  } catch (e) {
+    throw new ExpressError(`Problem occured in DB : ${e}`, 500);
+  }
+}
+
 const campgroundModel = {
   findAllCampgrounds,
   findCampgroundById,
   deleteReviewInCampground,
   deleteCampgroundById,
   createCampground,
+  editCampground,
 };
 
 export default campgroundModel;

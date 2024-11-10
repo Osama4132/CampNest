@@ -4,9 +4,11 @@ import {
   showCampgroundDetails,
   deleteCampground,
   createCampground,
+  editCampground,
+  showCampgroundEdit,
 } from "../controllers/campgrounds.ts";
 import multer from "multer";
-import cloudinary from "../../src/cloudinary/cloudinary.ts"
+import cloudinary from "../../src/cloudinary/cloudinary.ts";
 
 const upload = multer({ storage: cloudinary.storage });
 
@@ -31,5 +33,16 @@ router.post(
 router.get("/:id", showCampgroundDetails);
 
 router.delete("/:id", deleteCampground);
+
+router.get(
+  "/:id/edit",
+  (req, res, next) => {
+    console.log("Router hit!");
+    next();
+  },
+  showCampgroundEdit
+);
+
+router.post("/:id/edit", upload.array("images"), editCampground);
 
 export default router;

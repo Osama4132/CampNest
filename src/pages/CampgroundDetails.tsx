@@ -63,7 +63,9 @@ export default function CampgroundDetails() {
   };
 
   const deleteCampground = async () => {
-    const response = await axios.delete(`/api/campgrounds/${id}`);
+    const response = await axios.delete(`/api/campgrounds/${id}`, {
+      params: { user },
+    });
     if (response.status === 200) {
       navigate("/campgrounds");
     }
@@ -162,7 +164,7 @@ export default function CampgroundDetails() {
                         Price: ${campground.price}/night
                       </li>
                     </ul>
-                    {user === campground.author.id && (
+                    {user === campground.author._id && (
                       <div className="card-body p-3 d-flex gap-5 justify-content-center ">
                         <div className="d-flex">
                           <Link
