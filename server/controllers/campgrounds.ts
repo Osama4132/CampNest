@@ -3,6 +3,7 @@ import model from "../repos/campgrounds.ts";
 import ExpressErrorGeneric from "../../src/util/ExpressErrorGeneric.ts";
 import redisClient from "../redis.ts";
 
+
 export const showAllCampgrounds = async (req: Request, res: Response) => {
   const page = req.query.page ? Number(req.query.page) : 1;
   const productsPerPage = req.query.productsPerPage
@@ -30,14 +31,14 @@ export const showAllCampgrounds = async (req: Request, res: Response) => {
     searchQuery
   );
 
-  if(searchQuery === ""){
-  if (productsPerPage === 0)
-    await redisClient.set("allCampgrounds", JSON.stringify(campgrounds));
-  if (productsPerPage !== 0)
-    await redisClient.set(
-      `paginatedCampgrounds/${page}`,
-      JSON.stringify(campgrounds)
-    );
+  if (searchQuery === "") {
+    if (productsPerPage === 0)
+      await redisClient.set("allCampgrounds", JSON.stringify(campgrounds));
+    if (productsPerPage !== 0)
+      await redisClient.set(
+        `paginatedCampgrounds/${page}`,
+        JSON.stringify(campgrounds)
+      );
   }
 
   if (!campgrounds) {
@@ -45,6 +46,42 @@ export const showAllCampgrounds = async (req: Request, res: Response) => {
     return;
   }
   res.json(campgrounds);
+};
+
+export const createCampground = async (req: Request, res: Response) => {
+  try {
+    const {userId} = req.body
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+
+    const { longitude, latitude } = req.body;
+    const geometry = { coordinates: [+longitude, +latitude] };
+
+    const { location, description, price, title } = req.body;
+
+    const files = req.files as Express.Multer.File[];
+
+    const campgroundImages = files.map((f: any) => ({
+      url: f.path,
+      filename: f.filename,
+    }));
+    await model.createCampground(
+      geometry,
+      location,
+      description,
+      price,
+      title,
+      campgroundImages,
+      userId
+    );
+    clearCache();
+    res.status(200).send("Campground created!");
+    return;
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
 };
 
 export const showCampgroundDetails = async (req: Request, res: Response) => {
@@ -63,8 +100,14 @@ export const showCampgroundDetails = async (req: Request, res: Response) => {
 
 export const deleteCampground = async (req: Request, res: Response) => {
   try {
+    const {userId} = req.body
+    if (!userId) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
     const { id } = req.params;
     await model.deleteCampgroundById(id);
+    clearCache();
     res.status(200).json({ message: `Campground ID ${id} Deleted.` });
     return;
   } catch (e) {
@@ -92,4 +135,23 @@ async function cachePaginatedCampgrounds(res: Response, pageNumber: number) {
   } else {
     return false;
   }
+}
+
+export async function clearCache() {
+  await redisClient.del("allCampgrounds");
+  const pattern = "paginatedCampgrounds/*";
+  let cursor = 0;
+
+  do {
+    const reply = await redisClient.scan(cursor, {
+      MATCH: pattern,
+      COUNT: 100,
+    });
+    cursor = reply.cursor;
+    const keys = reply.keys;
+
+    if (keys.length > 0) {
+      await redisClient.del(keys);
+    }
+  } while (cursor !== 0);
 }

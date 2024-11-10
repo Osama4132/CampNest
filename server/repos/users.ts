@@ -17,6 +17,11 @@ export async function createUser(
   await newUser.save();
 }
 
-const userModel = { createUser };
+export async function getUserId(email: unknown) {
+  const user = User.findOne({ email: email });
+  return user
+}
+
+const userModel = { createUser, getUserId };
 
 export default userModel;
