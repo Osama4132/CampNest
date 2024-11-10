@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import model from "../repos/campgrounds.ts";
 import ExpressErrorGeneric from "../../src/util/ExpressErrorGeneric.ts";
 import redisClient from "../redis.ts";
-
+import ExpressError from "../../src/util/ExpressError.ts";
 
 export const showAllCampgrounds = async (req: Request, res: Response) => {
   const page = req.query.page ? Number(req.query.page) : 1;
@@ -50,7 +50,7 @@ export const showAllCampgrounds = async (req: Request, res: Response) => {
 
 export const createCampground = async (req: Request, res: Response) => {
   try {
-    const {userId} = req.body
+    const { userId } = req.body;
     if (!userId) {
       res.status(401).json({ message: "User not found" });
       return;
@@ -100,16 +100,75 @@ export const showCampgroundDetails = async (req: Request, res: Response) => {
 
 export const deleteCampground = async (req: Request, res: Response) => {
   try {
-    const {userId} = req.body
+    const { user } = req.query;
+    const userId = String(user)
     if (!userId) {
       res.status(401).json({ message: "User not found" });
       return;
     }
     const { id } = req.params;
-    await model.deleteCampgroundById(id);
+    await model.deleteCampgroundById(id, userId);
     clearCache();
     res.status(200).json({ message: `Campground ID ${id} Deleted.` });
     return;
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
+};
+
+export const showCampgroundEdit = async (req: Request, res: Response) => {
+  try {
+    const { id, userId } = req.params;
+    if (userId) {
+      res.status(401).json({ message: "User is not logged in." });
+      return;
+    }
+    const campground = await model.findCampgroundById(id);
+    //@ts-ignore
+    if (!campground?.author?._id === userId) {
+      throw new ExpressError("You are not the author of this campground", 403);
+    }
+    res.status(200).json(campground);
+    return;
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
+};
+
+export const editCampground = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { location, description, price, title, userId } = req.body;
+    if (!userId) {
+      res.status(401).json({ message: "User is not logged in." });
+      return;
+    }
+    let { deleteImages } = req.body;
+    if (!Array.isArray(deleteImages) && deleteImages !== undefined)
+      deleteImages = [deleteImages];
+
+    const { longitude, latitude } = req.body;
+    const geometry = { coordinates: [+longitude, +latitude] };
+
+    const files = req.files as Express.Multer.File[];
+
+    const campgroundImages = files.map((f: any) => ({
+      url: f.path,
+      filename: f.filename,
+    }));
+    await model.editCampground(
+      geometry,
+      id,
+      location,
+      description,
+      price,
+      title,
+      campgroundImages,
+      userId,
+      deleteImages
+    );
+    clearCache();
+    res.status(200).send("Campground Edited Sucessfully");
   } catch (e) {
     ExpressErrorGeneric(res, e);
   }

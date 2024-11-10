@@ -8,6 +8,7 @@ import Newcampground from "./pages/Newcampground";
 import Campgrounds from "./pages/Campgrounds";
 import CampgroundDetails from "./pages/CampgroundDetails";
 import ForgotPassword from "./pages/ForgotPassword";
+import CampgroundEdit from "./pages/CampgroundEdit";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     path: "campground/:id",
     element: <CampgroundDetails />,
   },
+  { path: "campground/:id/edit", element: <CampgroundEdit /> },
   {
     path: "/forgotpassword",
     element: <ForgotPassword />,
