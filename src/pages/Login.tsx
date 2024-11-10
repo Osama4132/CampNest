@@ -2,6 +2,7 @@ import { useFormik } from "formik";
 import { useNavigate, Link } from "react-router-dom";
 import { doSignInWithEmailAndPassword } from "../firebase/auth";
 import { useUser } from "../contexts/UserProvider";
+import axios from "axios";
 
 interface IFormikValues {
   email: string;
@@ -42,8 +43,16 @@ export default function Register() {
         const { email, password } = values;
         const response = await doSignInWithEmailAndPassword(email, password);
         if (response) {
-          getUser(response.user.uid);
-          navigate("/campgrounds");
+          console.log("ye")
+          const expressResponse = await axios.get("/api/user/id", {
+            params: {email},
+          });
+          console.log("express: ", expressResponse);
+          if (expressResponse) {
+            console.log("express:", expressResponse)
+            getUser(expressResponse.data.userId);
+            navigate("/campgrounds");
+          }
         }
       } catch (e) {
         throw new Error(`Error with the message: ${e}`);

@@ -6,6 +6,7 @@ import bsCustomFileInput from "bs-custom-file-input";
 import LocationPicker from "../components/LocationPicker";
 import Navbar from "../components/Navbar";
 import styles from "../styles/navbar.module.css";
+import { useUser } from "../contexts/UserProvider";
 
 interface IFormikValues {
   title: string;
@@ -52,6 +53,7 @@ const validate = (values: IFormikValues) => {
 };
 
 export default function NewCampground() {
+  const { user } = useUser();
   const navigate = useNavigate();
 
   const [marker, setMarker] = useState({
@@ -79,6 +81,7 @@ export default function NewCampground() {
       formData.append("description", values.description);
       formData.append("longitude", String(marker.longitude));
       formData.append("latitude", String(marker.latitude));
+      formData.append("userId", String(user))
       for (const pair of formData.entries()) {
         console.log(pair[0], pair[1]);
       }
@@ -94,15 +97,11 @@ export default function NewCampground() {
 
   return (
     <>
-      <Navbar styles={styles}/>
-      <div >
-        <div
-          className={`col-10 offset-1 col-md-8 offset-md-2 `}
-        >
-          <div >
-            <h1 className={`text-center `}>
-              Create a new Campground
-            </h1>
+      <Navbar styles={styles} />
+      <div>
+        <div className={`col-10 offset-1 col-md-8 offset-md-2 `}>
+          <div>
+            <h1 className={`text-center `}>Create a new Campground</h1>
             <hr />
             <div className="card-body">
               <form
@@ -153,11 +152,7 @@ export default function NewCampground() {
                     </div>
                   ) : null}
                 </div>
-                <LocationPicker
-                  marker={marker}
-                  onMapClick={setMarker}
-                  
-                />
+                <LocationPicker marker={marker} onMapClick={setMarker} />
                 <label
                   className={`form-label mt-3 fw-medium fs-3 `}
                   htmlFor="price"
@@ -165,9 +160,7 @@ export default function NewCampground() {
                   Price
                 </label>
                 <div className="input-group">
-                  <span className={`input-group-text `}>
-                    $
-                  </span>
+                  <span className={`input-group-text `}>$</span>
                   <input
                     placeholder="0.00"
                     type="text"

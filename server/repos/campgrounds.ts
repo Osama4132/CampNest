@@ -4,6 +4,11 @@ import cities from "../../src/seeds/cities.ts";
 import ExpressError from "../../src/util/ExpressError.ts";
 import Review from "./reviews.ts";
 
+interface IImages {
+  filename: string;
+  url: string;
+}
+
 const opts = { toJSON: { virtuals: true } };
 
 const campgroundSchema = new Schema(
@@ -124,6 +129,35 @@ async function findAllCampgrounds(
   return queryData;
 }
 
+async function createCampground(
+  geometry: { coordinates: number[] },
+  location: string,
+  description: string,
+  price: string,
+  title: string,
+  images: IImages[],
+  id: string
+) {
+  try {
+    const newCampground = new Campground({
+      geometry: { type: "Point", ...geometry },
+      location: `${location}`,
+      description: `${description}`,
+      price: price,
+      title: `${title}`,
+      images: images,
+      author: id,
+    });
+
+    await newCampground.save();
+  } catch (e) {
+    throw new ExpressError(
+      `Error in campgrounds repo with the error: ${e}`,
+      500
+    );
+  }
+}
+
 async function findCampgroundById(id: string) {
   try {
     const campground = await Campground.findById(id)
@@ -157,6 +191,7 @@ const campgroundModel = {
   findCampgroundById,
   deleteReviewInCampground,
   deleteCampgroundById,
+  createCampground,
 };
 
 export default campgroundModel;
