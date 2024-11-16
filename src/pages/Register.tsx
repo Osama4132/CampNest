@@ -2,6 +2,7 @@ import { useFormik } from "formik";
 import { useNavigate, Link } from "react-router-dom";
 import { doCreateUserWithEmailAndPassword } from "../firebase/auth";
 import axios from "axios";
+import { useToast } from "../contexts/ToastProvider";
 
 interface IFormikValues {
   username: string;
@@ -37,6 +38,7 @@ const validate = (values: IFormikValues) => {
 
 export default function Register() {
   const navigate = useNavigate();
+  const showToast = useToast()
 
   const formik = useFormik({
     initialValues: {
@@ -60,6 +62,7 @@ export default function Register() {
             "/api/user/register",
             newValues
           );
+          showToast("Confirmation email sent!", "green")
           navigate("/login");
         }
       } catch (e) {

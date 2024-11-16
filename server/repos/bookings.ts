@@ -30,13 +30,15 @@ export const Booking = mongoose.model("Booking", bookingSchema);
 export async function createBooking(
   startDate: Date,
   endDate: Date,
-  campgroundId: string
+  campgroundId: string,
+  author: string
 ) {
   try {
     const newBooking = new Booking({
       startDate: startDate,
       endDate: endDate,
       campground: campgroundId,
+      author: author
     });
 
     await newBooking.save();

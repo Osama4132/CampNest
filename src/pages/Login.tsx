@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { doSignInWithEmailAndPassword } from "../firebase/auth";
 import { useUser } from "../contexts/UserProvider";
 import axios from "axios";
+import { useToast } from "../contexts/ToastProvider";
 
 interface IFormikValues {
   email: string;
@@ -31,6 +32,7 @@ const validate = (values: IFormikValues) => {
 export default function Register() {
   const navigate = useNavigate();
   const { getUser } = useUser();
+  const showToast = useToast()
 
   const formik = useFormik({
     initialValues: {
@@ -43,18 +45,18 @@ export default function Register() {
         const { email, password } = values;
         const response = await doSignInWithEmailAndPassword(email, password);
         if (response) {
-          console.log("ye")
           const expressResponse = await axios.get("/api/user/id", {
             params: {email},
           });
-          console.log("express: ", expressResponse);
           if (expressResponse) {
             console.log("express:", expressResponse)
             getUser(expressResponse.data.userId);
+            showToast("Sucesfully logged in!", "green")
             navigate("/campgrounds");
           }
         }
       } catch (e) {
+        showToast("error logging in", "red")
         throw new Error(`Error with the message: ${e}`);
       }
     },

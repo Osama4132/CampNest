@@ -10,7 +10,7 @@ export const validateBooking = async (
 ) => {
   try {
     const { id: campgroundId } = req.params;
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, author } = req.body;
     const currentDate = Date.parse(new Date().toDateString());
 
     const campground = await CampgroundsModel.findCampgroundById(campgroundId);
@@ -22,9 +22,11 @@ export const validateBooking = async (
       throw new ExpressError("Start date can't be ahead of end date", 400);
     else if (newStartDate < +currentDate || newEndDate < +currentDate)
       throw new ExpressError(
-        "Start date or end date can't be before your own date, C'mon bro",
+        "Start date or end date can't be before your own date.",
         400
       );
+      if (campground?.author?._id == author)
+        throw new ExpressError("You can't book on your own campground", 403);
 
     if (campground?.bookings) {
       campground.bookings.map((booking: any) => {

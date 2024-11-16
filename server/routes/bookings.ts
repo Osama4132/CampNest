@@ -1,9 +1,11 @@
 import express from "express";
-import { createBooking } from "../controllers/bookings.ts"
-import { validateBooking } from "../repos/schemas/bookings.ts"
+import { createBooking, createStripe } from "../controllers/bookings.ts";
+import { validateBooking } from "../repos/schemas/bookings.ts";
 
 const router = express.Router();
 
-router.post("/:id", validateBooking, createBooking);
+router.post("/:id/stripe", validateBooking, createStripe);
+
+router.post("/success", createBooking)
 
 export default router;

@@ -7,6 +7,7 @@ import LocationPicker from "../components/LocationPicker";
 import Navbar from "../components/Navbar";
 import styles from "../styles/navbar.module.css";
 import { useUser } from "../contexts/UserProvider";
+import { useToast } from "../contexts/ToastProvider";
 
 interface IFormikValues {
   title: string;
@@ -24,14 +25,14 @@ const validate = (values: IFormikValues) => {
   const errors = {} as IErrorValues;
   if (!values.title) {
     errors.title = "Required";
-  } else if (values.title.length >= 10) {
-    errors.title = "Must be less than 10 characters";
+  } else if (values.title.length >= 100) {
+    errors.title = "Must be less than 100 characters";
   }
 
   if (!values.location) {
     errors.location = "Required";
-  } else if (values.location.length >= 10) {
-    errors.location = "Must be less than 10 characters";
+  } else if (values.location.length >= 100) {
+    errors.location = "Must be less than 100 characters";
   }
 
   if (!values.price) {
@@ -54,6 +55,7 @@ const validate = (values: IFormikValues) => {
 
 export default function NewCampground() {
   const { user } = useUser();
+  const showToast = useToast()
   const navigate = useNavigate();
 
   const [marker, setMarker] = useState({
@@ -88,6 +90,7 @@ export default function NewCampground() {
 
       const response = await axios.post("/api/campgrounds", formData);
       if (response.status === 200) {
+        showToast("Campground created sucesfully!", "green")
         navigate("/campgrounds");
       }
     },
@@ -100,7 +103,7 @@ export default function NewCampground() {
       <Navbar styles={styles} />
       <div>
         <div className={`col-10 offset-1 col-md-8 offset-md-2 `}>
-          <div>
+          <div className="mt-5 pt-3">
             <h1 className={`text-center `}>Create a new Campground</h1>
             <hr />
             <div className="card-body">

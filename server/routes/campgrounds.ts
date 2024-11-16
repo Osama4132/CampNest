@@ -19,29 +19,13 @@ router.get("/test", (req, res) => {
 
 router.get("/", showAllCampgrounds);
 
-router.post(
-  "/",
-
-  upload.array("images"),
-  createCampground,
-  (req, res) => {
-    console.log(req.body, "-----", req.files);
-    res.status(200).send("Upload completed");
-  }
-);
+router.post("/", upload.array("images"), createCampground);
 
 router.get("/:id", showCampgroundDetails);
 
 router.delete("/:id", deleteCampground);
 
-router.get(
-  "/:id/edit",
-  (req, res, next) => {
-    console.log("Router hit!");
-    next();
-  },
-  showCampgroundEdit
-);
+router.get("/:id/edit", showCampgroundEdit);
 
 router.post("/:id/edit", upload.array("images"), editCampground);
 

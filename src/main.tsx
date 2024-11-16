@@ -7,10 +7,10 @@ import { UserProvider } from "./contexts/UserProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <UserProvider>
-      <ToastProvider>
+    <ToastProvider>
+      <UserProvider>
         <RouterProvider router={router} />
-      </ToastProvider>
-    </UserProvider>
+      </UserProvider>
+    </ToastProvider>
   </StrictMode>
 );
