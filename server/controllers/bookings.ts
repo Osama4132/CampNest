@@ -3,6 +3,7 @@ import BookingRepo from "../repos/bookings.ts";
 import ExpressErrorGeneric from "../../src/util/ExpressErrorGeneric.ts";
 import Stripe from "stripe";
 import { differenceInCalendarDays } from "date-fns";
+import ExpressError from "../../src/util/ExpressError.ts";
 
 const stripe = new Stripe(
   "sk_test_51QLaWKAcA3yWl5YihFqMmPrhCAgttWYREcaYCs6bL2qVxqrafnH34hdLA6yp7lqOlRfKZtfx3Umt2VtNRwq8aA6j00v5GWvANj"
@@ -15,6 +16,29 @@ export const createBooking = async (req: Request, res: Response) => {
     BookingRepo.createBooking(startDate, endDate, campgroundId, author);
 
     res.status(200).json({ message: "Booking created" });
+    return;
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
+};
+
+export const fetchBookingsByUserId = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.query
+    const userId = String(id)
+    if (!userId) {
+      throw new ExpressError("User not found", 401);
+    }
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const productsPerPage = req.query.productsPerPage
+      ? Number(req.query.productsPerPage)
+      : 0;
+    const campgrounds = await BookingRepo.fetchBookingsByUserId(
+      userId,
+      page,
+      productsPerPage
+    );
+    res.status(200).json(campgrounds);
     return;
   } catch (e) {
     ExpressErrorGeneric(res, e);
