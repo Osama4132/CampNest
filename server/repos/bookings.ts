@@ -1,6 +1,7 @@
 import mongoose, { Types } from "mongoose";
 import model from "./campgrounds.ts";
 import ExpressError from "../../src/util/ExpressError.ts";
+import campgroundModel from "./campgrounds.ts";
 
 interface IBooking {
   _id: Types.ObjectId;
@@ -120,10 +121,129 @@ export async function fetchBookingsByUserId(
   }
 }
 
+async function fetchFutureBookingsByCampgroundId(campgroundId: string) {
+  const campground = await campgroundModel.Campground.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(campgroundId),
+      },
+    },
+    {
+      $unwind: {
+        path: "$bookings",
+      },
+    },
+    {
+      $lookup: {
+        from: "bookings",
+        localField: "bookings",
+        foreignField: "_id",
+        as: "bookings",
+      },
+    },
+    {
+      $unwind: {
+        path: "$bookings",
+      },
+    },
+    {
+      $match: {
+        "bookings.startDate": {
+          $gte: new Date(
+            new Date().getFullYear(),
+            new Date().getMonth(),
+            new Date().getDate()
+          ),
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    {
+      $unwind: {
+        path: "$author",
+      },
+    },
+    {
+      $sort: {
+        "bookings.startDate": 1,
+      },
+    },
+  ]);
+  console.log("DB Campgrounds:", campground);
+  return campground;
+}
+
+async function fetchPastBookingsByCampgroundId(campgroundId: string) {
+  const campground = await campgroundModel.Campground.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(campgroundId),
+      },
+    },
+    {
+      $unwind: {
+        path: "$bookings",
+      },
+    },
+    {
+      $lookup: {
+        from: "bookings",
+        localField: "bookings",
+        foreignField: "_id",
+        as: "bookings",
+      },
+    },
+    {
+      $unwind: {
+        path: "$bookings",
+      },
+    },
+    {
+      $match: {
+        "bookings.startDate": {
+          $lt: new Date(
+            new Date().getFullYear(),
+            new Date().getMonth(),
+            new Date().getDate()
+          ),
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    {
+      $unwind: {
+        path: "$author",
+      },
+    },
+    {
+      $sort: {
+        "bookings.startDate": 1,
+      },
+    },
+  ]);
+  return campground;
+}
+
 const BookingRepo = {
   createBooking,
   findBookingById,
   fetchBookingsByUserId,
+  fetchPastBookingsByCampgroundId,
+  fetchFutureBookingsByCampgroundId
 };
 
 export default BookingRepo;

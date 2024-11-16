@@ -5,6 +5,7 @@ import ExpressError from "../../src/util/ExpressError.ts";
 import cloudinary from "../../src/cloudinary/cloudinary.ts";
 import Review from "./reviews.ts";
 import { clearCache } from "../controllers/campgrounds.ts";
+import { Booking } from "./bookings.ts";
 
 interface IImages {
   filename: string;
@@ -61,11 +62,13 @@ campgroundSchema.post("findOneAndDelete", async function (doc) {
 
 const Campground = mongoose.model("Campground", campgroundSchema);
 
-const seedAmount = 100;
+const seedAmount = 22;
 
 //Placeholder random data for testing purposes
 export async function seedCampgrounds() {
   await Campground.deleteMany({});
+  await Booking.deleteMany({})
+  await Review.deleteMany({})
   clearCache()
   Array(seedAmount)
     .fill(undefined)
@@ -340,7 +343,8 @@ const campgroundModel = {
   deleteCampgroundById,
   createCampground,
   editCampground,
-  fetchCampgroundsByUserId
+  fetchCampgroundsByUserId,
+  Campground
 };
 
 export default campgroundModel;
