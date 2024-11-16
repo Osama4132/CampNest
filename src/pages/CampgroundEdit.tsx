@@ -7,7 +7,8 @@ import bsCustomFileInput from "bs-custom-file-input";
 import LocationPicker from "../components/LocationPicker";
 import Navbar from "../components/Navbar";
 import { useUser } from "../contexts/UserProvider";
-import styles from "../styles/navbar.module.css"
+import styles from "../styles/navbar.module.css";
+import { useToast } from "../contexts/ToastProvider";
 
 interface IFormikValues {
   title: string;
@@ -45,6 +46,7 @@ const validate = (values: IFormikValues) => {
 };
 
 export default function CampgroundEdit() {
+  const showToast = useToast();
   const { user } = useUser();
   const [campground, setCampground] = useState<Campground | null>(null);
 
@@ -58,7 +60,7 @@ export default function CampgroundEdit() {
 
   const getCampgroundInfo = useCallback(async () => {
     const info = await axios.get(`/api/campgrounds/${id}/edit`, {
-      params: { user },
+      params: { userId: user },
     });
     setCampground(info.data);
   }, [id, user]);
@@ -102,6 +104,7 @@ export default function CampgroundEdit() {
       );
 
       if (response.status === 200) {
+        showToast("Campground edited sucesfully!", "green");
         navigate(`/campground/${id}`);
       }
     },
@@ -112,17 +115,17 @@ export default function CampgroundEdit() {
   return (
     <>
       {!campground ? (
-        <h1>...Loading...Or Is it?...idk</h1>
+        <h1>Loading edit campgrounds...</h1>
       ) : (
         <>
           {campground.author._id !== user ? (
             <Navigate to="/campgrounds" />
           ) : (
             <>
-              <Navbar styles={styles}/>
+              <Navbar styles={styles} />
               <div>
                 <div className={`col-10 offset-1 col-md-8 offset-md-2`}>
-                  <div>
+                  <div className="mt-5 pt-3">
                     <h1 className={`text-center `}>Edit Campground</h1>
                     <hr />
                     <div className="col-12">

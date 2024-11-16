@@ -13,11 +13,13 @@ import { useFormik } from "formik";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useUser } from "../contexts/UserProvider.tsx";
+import { useToast } from "../contexts/ToastProvider.tsx";
 
 const mapboxEnv = import.meta.env.VITE_MAPBOX_TOKEN;
 
 export default function CampgroundDetails() {
   const { user } = useUser();
+  const showToast = useToast();
 
   const [campground, setCampground] = useState(null);
 
@@ -42,12 +44,23 @@ export default function CampgroundDetails() {
 
   const submitBooking = async () => {
     try {
-      const response = await axios.post(`/api/booking/${id}`, {
+      if (!user) showToast("You must be logged in to book", "red");
+      const response = await axios.post(`/api/booking/${id}/stripe`, {
         startDate: startDate,
         endDate: endDate,
+        price: campground.price,
+        campgroundId: campground._id,
+        author: user,
       });
+      const { url } = response.data;
+      window.open(url, "_blank");
     } catch (e) {
-      console.error(e);
+      if (e.response.data.message) {
+        showToast(`${e.response.data.message}`, "red");
+      } else {
+        showToast("Booking overlap", "red");
+      }
+      console.error(e)
     }
   };
 
@@ -67,6 +80,7 @@ export default function CampgroundDetails() {
       params: { user },
     });
     if (response.status === 200) {
+      showToast("Campground Deleted!", "green");
       navigate("/campgrounds");
     }
   };

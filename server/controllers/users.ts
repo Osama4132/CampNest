@@ -16,7 +16,7 @@ export const getUserId = async (req: Request, res: Response) => {
     const {email} = req.query
     const user = await userModel.getUserId(email);
     if(!user) throw new ExpressError("User not found", 401)
-    res.status(200).json({ userId: user._id });
+    res.status(200).json({ userId: user._id, email: user.email });
   return
   } catch (e) {
     ExpressErrorGeneric(res, e);

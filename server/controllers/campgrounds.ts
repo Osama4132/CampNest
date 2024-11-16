@@ -101,7 +101,7 @@ export const showCampgroundDetails = async (req: Request, res: Response) => {
 export const deleteCampground = async (req: Request, res: Response) => {
   try {
     const { user } = req.query;
-    const userId = String(user)
+    const userId = String(user);
     if (!userId) {
       res.status(401).json({ message: "User not found" });
       return;
@@ -118,14 +118,15 @@ export const deleteCampground = async (req: Request, res: Response) => {
 
 export const showCampgroundEdit = async (req: Request, res: Response) => {
   try {
-    const { id, userId } = req.params;
-    if (userId) {
+    const { id } = req.params;
+    const { userId } = req.query;
+    if (!userId) {
       res.status(401).json({ message: "User is not logged in." });
       return;
     }
     const campground = await model.findCampgroundById(id);
     //@ts-ignore
-    if (!campground?.author?._id === userId) {
+    if (String(campground?.author?._id) !== userId) {
       throw new ExpressError("You are not the author of this campground", 403);
     }
     res.status(200).json(campground);

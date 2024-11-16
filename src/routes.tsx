@@ -9,6 +9,7 @@ import Campgrounds from "./pages/Campgrounds";
 import CampgroundDetails from "./pages/CampgroundDetails";
 import ForgotPassword from "./pages/ForgotPassword";
 import CampgroundEdit from "./pages/CampgroundEdit";
+import SuccessPage from "./pages/SuccessPage";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
     path: "/forgotpassword",
     element: <ForgotPassword />,
   },
+  { path: "/success", element: <SuccessPage /> },
 ]);
 
 export default router;
