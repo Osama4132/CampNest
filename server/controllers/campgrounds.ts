@@ -175,6 +175,31 @@ export const editCampground = async (req: Request, res: Response) => {
   }
 };
 
+export const fetchCampgroundsByUserId = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.query;
+    const userId = String(id);
+
+    if (!userId) {
+      throw new ExpressError("User not found", 401);
+    }
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const productsPerPage = req.query.productsPerPage
+      ? Number(req.query.productsPerPage)
+      : 0;
+
+    const campgrounds = await model.fetchCampgroundsByUserId(
+      userId,
+      page,
+      productsPerPage
+    );
+    res.status(200).json(campgrounds);
+    return;
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
+};
+
 async function cacheAllCampgrounds(res: Response) {
   const cacheValue = await redisClient.get("allCampgrounds");
   if (cacheValue) {

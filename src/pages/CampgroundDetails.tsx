@@ -142,6 +142,7 @@ export default function CampgroundDetails() {
     },
     validate,
     onSubmit: async (values) => {
+      values = {...values, id: user}
       await axios.post(`/api/campgrounds/${id}/review`, values);
       getCampground();
     },

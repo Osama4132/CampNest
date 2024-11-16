@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import userModel from "../repos/users.ts";
+import userModel, {fetchUserDataFromDB} from "../repos/users.ts";
 import ExpressErrorGeneric from "../../src/util/ExpressErrorGeneric.ts";
 import ExpressError from "../../src/util/ExpressError.ts";
 
@@ -13,11 +13,25 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const getUserId = async (req: Request, res: Response) => {
   try {
-    const {email} = req.query
+    const { email } = req.query;
     const user = await userModel.getUserId(email);
-    if(!user) throw new ExpressError("User not found", 401)
+    if (!user) throw new ExpressError("User not found", 401);
     res.status(200).json({ userId: user._id, email: user.email });
-  return
+    return;
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
+};
+
+export const fetchUserData = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.query;
+    console.log("Id:", id)
+    const userId = String(id);
+    if (!userId) throw new ExpressError("User not found", 401);
+    const userData = await fetchUserDataFromDB(userId);
+    res.status(200).json(userData);
+    return;
   } catch (e) {
     ExpressErrorGeneric(res, e);
   }

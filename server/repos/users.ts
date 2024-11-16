@@ -22,6 +22,12 @@ export async function getUserId(email: unknown) {
   return user
 }
 
+export async function fetchUserDataFromDB(userId: string) {
+  const user = await User.findById(userId)
+  console.log("User DB:", user)
+  return user;
+}
+
 const userModel = { createUser, getUserId };
 
 export default userModel;

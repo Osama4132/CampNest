@@ -250,6 +250,89 @@ async function editCampground(
   }
 }
 
+async function fetchCampgroundsByUserId(
+  userId: string,
+  page: number = 1,
+  productsPerPage: number = 0
+) {
+  const campgrounds = await Campground.aggregate([
+    {
+      $match: {
+        author: new mongoose.Types.ObjectId(userId),
+      },
+    },
+
+    {
+      $lookup: {
+        from: "reviews",
+        localField: "reviews",
+        foreignField: "_id",
+        as: "reviews",
+      },
+    },
+    {
+      $addFields: {
+        avgReviewRating: {
+          $ifNull: [
+            {
+              $trunc: [
+                {
+                  $avg: {
+                    $map: {
+                      input: "$reviews",
+                      as: "review",
+                      in: "$$review.rating",
+                    },
+                  },
+                },
+                2,
+              ],
+            },
+            "N/A",
+          ],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "bookings",
+        localField: "bookings",
+        foreignField: "_id",
+        as: "bookings",
+      },
+    },
+    {
+      $addFields: {
+        upcomingBookings: {
+          $size: {
+            $filter: {
+              input: "$bookings",
+              as: "booking",
+              cond: {
+                $lte: [
+                  "booking.startDate",
+                  new Date(
+                    new Date().getFullYear(),
+                    new Date().getMonth(),
+                    new Date().getDate()
+                  ),
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
+  ])
+    .skip((page - 1) * productsPerPage)
+    .limit(productsPerPage);
+  const campgroundsCount = await Campground.find({
+    author: userId,
+  }).countDocuments();
+  const queryData = { campgrounds: campgrounds, count: campgroundsCount };
+  return queryData;
+}
+
 const campgroundModel = {
   findAllCampgrounds,
   findCampgroundById,
@@ -257,6 +340,7 @@ const campgroundModel = {
   deleteCampgroundById,
   createCampground,
   editCampground,
+  fetchCampgroundsByUserId
 };
 
 export default campgroundModel;
