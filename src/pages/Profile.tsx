@@ -132,7 +132,7 @@ export default function Profile() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    const response = await doResetPassword(userData.email);
+    const response = await doResetPassword(userData.email); 
     showToast("Password reset email sent!", "green");
   };
   useEffect(() => {
@@ -167,7 +167,7 @@ export default function Profile() {
             campgroundId={selectedCampgroundId}
           />
           <Navbar styles={styles} />
-          <div className={` container mt-5`}>
+          <div className={` container mt-5`} style={{backgroundColor: "#f5f5dccf"}}>
             <div className={`container `}>
               <div className=" d-flex justify-content-center ">
                 <div className="col-12 col-xl-9">

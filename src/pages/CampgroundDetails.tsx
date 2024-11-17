@@ -255,7 +255,7 @@ export default function CampgroundDetails() {
                           />
                         </div>
                         <div className="mt-5 d-flex col-12 justify-content-center">
-                          <button onClick={submitBooking} className={`btn `}>
+                          <button onClick={submitBooking} className={`btn btn-success`}>
                             Book Campground
                           </button>
                         </div>
