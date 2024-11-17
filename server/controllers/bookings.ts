@@ -24,8 +24,8 @@ export const createBooking = async (req: Request, res: Response) => {
 
 export const fetchBookingsByUserId = async (req: Request, res: Response) => {
   try {
-    const {id} = req.query
-    const userId = String(id)
+    const { id } = req.query;
+    const userId = String(id);
     if (!userId) {
       throw new ExpressError("User not found", 401);
     }
@@ -78,6 +78,46 @@ export const createStripe = async (
     });
     res.json({ url: session.url });
     next();
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
+};
+
+export const fetchFutureBookingsByCampgroundId = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const userId = String(id);
+    if (!userId) {
+      throw new ExpressError("User not found", 401);
+    }
+    const { campground: campgroundId } = req.params;
+    const bookings = await BookingRepo.fetchFutureBookingsByCampgroundId(
+      campgroundId
+    );
+    res.status(200).json(bookings);
+  } catch (e) {
+    ExpressErrorGeneric(res, e);
+  }
+};
+
+export const fetchPastBookingsByCampgroundId = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const userId = String(id);
+    if (!userId) {
+      throw new ExpressError("User not found", 401);
+    }
+    const { campground: campgroundId } = req.params;
+    const bookings = await BookingRepo.fetchPastBookingsByCampgroundId(
+      campgroundId
+    );
+    res.status(200).json(bookings);
   } catch (e) {
     ExpressErrorGeneric(res, e);
   }

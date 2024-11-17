@@ -10,6 +10,8 @@ import Bookings from "../components/profile/Bookings";
 import Campgrounds from "../components/profile/Campgrounds";
 import Reviews from "../components/profile/Reviews";
 import styles from "../styles/navbar.module.css";
+import FutureBookings from "../components/profile/checkbookings/FutureBookings";
+import PastBookings from "../components/profile/checkbookings/PastBookings";
 import { doResetPassword } from "../firebase/auth";
 import { useToast } from "../contexts/ToastProvider";
 
@@ -30,6 +32,17 @@ export default function Profile() {
   const cardPerPage = 4;
 
   const [, setSearchParams] = useSearchParams();
+
+  const [showFutureBookings, setFutureBookings] = useState(false);
+  const [showPastBookings, setShowPastBookings] = useState(false);
+
+  const [campgroundBookings, setCampgroundBookings] = useState([]);
+  const [selectedCampgroundId, setSelectedCampgroundID] = useState("");
+
+  const switchForms = () => {
+    setFutureBookings(!showFutureBookings);
+    setShowPastBookings(!showPastBookings);
+  };
 
   const fetchUserData = useCallback(async () => {
     try {
@@ -103,6 +116,20 @@ export default function Profile() {
     if (fetchedData.dataType === "reviews") fetchReviews();
   }, [fetchCampgrounds, fetchBookings, fetchReviews, fetchedData.dataType]);
 
+  const fetchFutureBookingsByCampground = async (campgroundId: string) => {
+    const response = await axios.get(`/api/booking/${campgroundId}/future`, {
+      params: { id: user },
+    });
+    setCampgroundBookings(response.data);
+  };
+
+  const fetchPastBookingsByCampground = async (campgroundId: string) => {
+    const response = await axios.get(`/api/booking/${campgroundId}/past`, {
+      params: { id: user },
+    });
+    setCampgroundBookings(response.data);
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     const response = await doResetPassword(userData.email);
@@ -123,6 +150,22 @@ export default function Profile() {
         <h1>Loading User Info...</h1>
       ) : (
         <>
+          <FutureBookings
+            futureBookingsState={showFutureBookings}
+            setFutureBookingsState={setFutureBookings}
+            switchForms={switchForms}
+            campgrounds={campgroundBookings}
+            fetchPastBookingsByCampground={fetchPastBookingsByCampground}
+            campgroundId={selectedCampgroundId}
+          />
+          <PastBookings
+            pastBookingsState={showPastBookings}
+            setPastBookingsState={setShowPastBookings}
+            switchForms={switchForms}
+            campgrounds={campgroundBookings}
+            fetchFutureBookingsByCampground={fetchFutureBookingsByCampground}
+            campgroundId={selectedCampgroundId}
+          />
           <Navbar styles={styles} />
           <div className={` container mt-5`}>
             <div className={`container `}>
@@ -142,6 +185,7 @@ export default function Profile() {
                         <h5 style={{ padding: "4px" }}>{userData.email}</h5>
                       </div>
                     </div>
+
                     <form
                       onSubmit={handleChangePassword}
                       className="col-12 col-lg-6 mt-lg-0 mt-3 justify-content-end align-items-end"
@@ -150,6 +194,7 @@ export default function Profile() {
                         Change Password
                       </h1>
                       <div className="flex-column d-flex align-items-lg-end">
+
                         <button className="col-8 col-lg-7 align-self-start align-self-lg-end mt-3 btn btn-primary">
                           Change Password
                         </button>
@@ -209,7 +254,16 @@ export default function Profile() {
                 />
               ) : (
                 fetchedData.data.map((campground) => (
-                  <Campgrounds key={campground._id} campground={campground} />
+                  <Campgrounds
+                    key={campground._id}
+                    campground={campground}
+                    checkBookingsToggle={() =>
+                      setFutureBookings(!showFutureBookings)
+                    }
+                    fetchBookingsByCampground={fetchFutureBookingsByCampground}
+                    setSelectedCampgroundID={setSelectedCampgroundID}
+                  />
+
                 ))
               )
             ) : null}

@@ -104,7 +104,7 @@ export default function CampgroundEdit() {
       );
 
       if (response.status === 200) {
-        showToast("Campground edited sucesfully!", "green");
+        showToast("Campground edited successfully!", "green");
         navigate(`/campground/${id}`);
       }
     },

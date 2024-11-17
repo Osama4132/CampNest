@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 
 export default function Campgrounds({
-  campground
+  campground,
+  checkBookingsToggle,
+  fetchBookingsByCampground,
+  setSelectedCampgroundID,
 }) {
   return (
     <>

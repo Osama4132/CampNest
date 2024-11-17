@@ -60,7 +60,7 @@ export default function CampgroundDetails() {
       } else {
         showToast("Booking overlap", "red");
       }
-      console.error(e)
+      console.error(e);
     }
   };
 
@@ -142,7 +142,7 @@ export default function CampgroundDetails() {
     },
     validate,
     onSubmit: async (values) => {
-      values = {...values, id: user}
+      values = { ...values, id: user };
       await axios.post(`/api/campgrounds/${id}/review`, values);
       getCampground();
     },
@@ -212,34 +212,56 @@ export default function CampgroundDetails() {
                   className={`gap-3 p-3 col-lg-12 d-flex flex-column `}
                   style={{ backgroundColor: "#f5f5dccf" }}
                 >
-                  <div className={`row col-12 text-center `}>
-                    <h2>Book Campground?</h2>
-                  </div>
-                  <div className="row">
-                    <div className="col-6 d-flex flex-column align-items-center">
-                      <h4 className={`p-0 mb-2 `}>Start date:</h4>
-                      <DatePicker
-                        showIcon
-                        toggleCalendarOnIconClick
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                      />
-                    </div>
-                    <div className="col-6 d-flex flex-column align-items-center">
-                      <h4 className={`p-0 mb-2 `}>End date:</h4>
-                      <DatePicker
-                        showIcon
-                        toggleCalendarOnIconClick
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                      />
-                    </div>
-                    <div className="mt-5 d-flex col-12 justify-content-center">
-                      <button onClick={submitBooking} className={`btn `}>
-                        Book Campground
-                      </button>
-                    </div>
-                  </div>
+                  {campground.author._id === user ? (
+                    <>
+                      <div
+                        className={`text-center fs-2 fw-bold ${styles.campgroundAuthorText}`}
+                      >
+                        This is your campground
+                      </div>
+                      <div
+                        className={`fs-4 text-center fw-bold ${styles.campgroundAuthorText}`}
+                      >
+                        Click below to see if you have any bookings!
+                      </div>
+                      <div className="align-self-center">
+                        <Link to="/profile">
+                          <button className="btn btn-success ">Profile</button>
+                        </Link>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className={`row col-12 text-center `}>
+                        <h2>Book Campground?</h2>
+                      </div>
+                      <div className="row">
+                        <div className="col-6 d-flex flex-column align-items-center">
+                          <h4 className={`p-0 mb-2 `}>Start date:</h4>
+                          <DatePicker
+                            showIcon
+                            toggleCalendarOnIconClick
+                            selected={startDate}
+                            onChange={(date) => setStartDate(date)}
+                          />
+                        </div>
+                        <div className="col-6 d-flex flex-column align-items-center">
+                          <h4 className={`p-0 mb-2 `}>End date:</h4>
+                          <DatePicker
+                            showIcon
+                            toggleCalendarOnIconClick
+                            selected={endDate}
+                            onChange={(date) => setEndDate(date)}
+                          />
+                        </div>
+                        <div className="mt-5 d-flex col-12 justify-content-center">
+                          <button onClick={submitBooking} className={`btn `}>
+                            Book Campground
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               <div
