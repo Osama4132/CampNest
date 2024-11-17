@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useUser } from "../contexts/UserProvider";
 import Pagination from "../components/Pagination";
 import axios from "axios";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RedirectBox from "../components/profile/RedirectBox";
@@ -12,9 +12,12 @@ import Reviews from "../components/profile/Reviews";
 import styles from "../styles/navbar.module.css";
 import FutureBookings from "../components/profile/checkbookings/FutureBookings";
 import PastBookings from "../components/profile/checkbookings/PastBookings";
+import { doResetPassword } from "../firebase/auth";
+import { useToast } from "../contexts/ToastProvider";
 
 export default function Profile() {
   const { user } = useUser();
+  const showToast = useToast();
 
   const [fetchedData, setFetchedData] = useState({
     data: [],
@@ -127,6 +130,11 @@ export default function Profile() {
     setCampgroundBookings(response.data);
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    const response = await doResetPassword(userData.email);
+    showToast("Password reset email sent!", "green");
+  };
   useEffect(() => {
     setPageNumInURL();
     callAPIAgain();
@@ -177,27 +185,16 @@ export default function Profile() {
                         <h5 style={{ padding: "4px" }}>{userData.email}</h5>
                       </div>
                     </div>
-                    <form className="col-12 col-lg-6 mt-lg-0 mt-3 justify-content-end align-items-end">
+
+                    <form
+                      onSubmit={handleChangePassword}
+                      className="col-12 col-lg-6 mt-lg-0 mt-3 justify-content-end align-items-end"
+                    >
                       <h1 className="text-lg-end text-start">
                         Change Password
                       </h1>
                       <div className="flex-column d-flex align-items-lg-end">
-                        <div className="d-flex justify-content-start justify-content-lg-end mb-2">
-                          <div className="">Old Password: &nbsp;</div>
-                          <input
-                            className="col-6 align-self-stretch"
-                            type="password"
-                            name="oldPassword"
-                          />
-                        </div>
-                        <div className="d-flex justify-content-start justify-content-lg-end  mt-3">
-                          <div className="">New Password: &nbsp;</div>
-                          <input
-                            className="col-6"
-                            type="password"
-                            name="newPassword"
-                          />
-                        </div>
+
                         <button className="col-8 col-lg-7 align-self-start align-self-lg-end mt-3 btn btn-primary">
                           Change Password
                         </button>
@@ -266,6 +263,7 @@ export default function Profile() {
                     fetchBookingsByCampground={fetchFutureBookingsByCampground}
                     setSelectedCampgroundID={setSelectedCampgroundID}
                   />
+
                 ))
               )
             ) : null}
