@@ -35,6 +35,7 @@ export default function Reviews({ review }) {
                 <div className="d-flex flex-row  px-4 py-2 text-center fw-bold">
                   <div className="col-lg-3 col-4">Campground</div>
                   <div className="col-lg-2 col-4">Rating</div>
+                  <div className="col-lg-7 col-8">Review</div>
                 </div>
                 <div className="d-flex flex-row px-4 py-2 align-items-center text-center">
                   <div

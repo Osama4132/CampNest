@@ -31,8 +31,8 @@ const validate = (values: IFormikValues) => {
 
   if (!values.location) {
     errors.location = "Required";
-  } else if (values.location.length >= 100) {
-    errors.location = "Must be less than 100 characters";
+  } else if (values.location.length <= 10) {
+    errors.location = "Must be more than 10 characters";
   }
 
   if (!values.price) {

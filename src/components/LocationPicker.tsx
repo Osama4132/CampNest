@@ -16,11 +16,7 @@ const LocationPicker = ({
   marker: IMarker;
   onMapClick(geometry: IMarker): void;
 }) => {
-  const [viewState, setViewState] = useState({
-    latitude: 37.7749,
-    longitude: -122.4194,
-    zoom: 12,
-  });
+  const [viewState, setViewState] = useState({ ...marker, zoom: 12 });
 
   const handleMapClick = (e: MapMouseEvent) => {
     const { lng: longitude, lat: latitude } = e.lngLat;
@@ -29,7 +25,7 @@ const LocationPicker = ({
 
   return (
     <div>
-      <h3 >Select a Location</h3>
+      <h3>Select a Location</h3>
       <Map
         {...viewState}
         style={{ width: "100%", height: "400px" }}

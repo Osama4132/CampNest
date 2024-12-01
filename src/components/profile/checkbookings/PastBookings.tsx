@@ -71,7 +71,7 @@ export default function PastBookings({
                                   maxHeight: "25vh",
                                 }}
                               >
-                                {campground.author.username}
+                                NewUser123
                               </div>
                               <div
                                 className="col "

@@ -164,7 +164,7 @@ export default function CampgroundDetails() {
                   <div className={`card`}>
                     <div className={`card-body `}>
                       <h5 className={`card-title fs-3`}>{campground.title}</h5>
-                      <pre className={`card-text`}>
+                      <pre className={`card-text`} style={{overflowY: "auto", whiteSpace: "pre-wrap", maxHeight: "15vh"}}>
                         {campground.description}
                       </pre>
                     </div>

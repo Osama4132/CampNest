@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useFormik } from "formik";
 import { Campground } from "../../types";
@@ -21,8 +21,8 @@ const validate = (values: IFormikValues) => {
   const errors = {} as Partial<IFormikValues>;
   if (!values.title) {
     errors.title = "Required";
-  } else if (values.title.length <= 10) {
-    errors.title = "Must be less than 10 characters";
+  } else if (values.title.length <= 5) {
+    errors.title = "Must be more than 5 characters";
   }
 
   if (!values.location) {
@@ -50,6 +50,8 @@ export default function CampgroundEdit() {
   const { user } = useUser();
   const [campground, setCampground] = useState<Campground | null>(null);
 
+  const [mapLoading, setMapLoading] = useState(true);
+
   const [marker, setMarker] = useState({
     latitude: 37.7749,
     longitude: -122.4194,
@@ -63,6 +65,10 @@ export default function CampgroundEdit() {
       params: { userId: user },
     });
     setCampground(info.data);
+    const [longitude, latitude] = info.data.geometry.coordinates;
+    console.log("long", longitude);
+    setMarker(() => ({ latitude: latitude, longitude: longitude }));
+    setMapLoading(false);
   }, [id, user]);
 
   useEffect(() => {
@@ -71,13 +77,14 @@ export default function CampgroundEdit() {
 
   const formik = useFormik({
     initialValues: {
-      title: "",
-      location: "",
-      price: "",
+      title: campground?.title || "",
+      location: campground?.location || "",
+      price: campground?.price || "",
       images: [],
-      description: "",
+      description: campground?.description || "",
       deleteImages: [],
     },
+    enableReinitialize: true,
     validate,
     onSubmit: async (values) => {
       const formData = new FormData();
@@ -179,10 +186,13 @@ export default function CampgroundEdit() {
                             </div>
                           ) : null}
                         </div>
-                        <LocationPicker
-                          marker={marker}
-                          onMapClick={setMarker}
-                        />
+                        {!mapLoading && (
+                          <LocationPicker
+                            marker={marker}
+                            onMapClick={setMarker}
+                          />
+                        )}
+
                         <label
                           className={`form-label mt-3 fw-medium fs-3 `}
                           htmlFor="price"

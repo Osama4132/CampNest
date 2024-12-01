@@ -66,7 +66,7 @@ async function findBookingById(BookingId: string) {
   return booking;
 }
 
-export async function fetchBookingsByUserId(
+async function fetchBookingsByUserId(
   userId: string,
   page: number = 1,
   productsPerPage: number = 0
@@ -117,7 +117,11 @@ export async function fetchBookingsByUserId(
     const queryData = { bookings: bookings, count: bookingsCount };
     return queryData;
   } catch (e) {
-    throw new Error(`DB Error: ${e}`);
+    console.error(e);
+    throw new ExpressError(
+      `Error in campgrounds repo with the error: ${e}`,
+      500
+    );
   }
 }
 
@@ -160,19 +164,19 @@ async function fetchFutureBookingsByCampgroundId(campgroundId: string) {
     {
       $lookup: {
         from: "users",
-        localField: "author",
+        localField: "bookings.author",
         foreignField: "_id",
-        as: "author",
+        as: "bookings",
       },
     },
     {
       $unwind: {
-        path: "$author",
+        path: "$bookings",
       },
     },
     {
       $sort: {
-        "bookings.startDate": 1,
+        "bookings.startDate": -1,
       },
     },
   ]);
@@ -243,7 +247,7 @@ const BookingRepo = {
   findBookingById,
   fetchBookingsByUserId,
   fetchPastBookingsByCampgroundId,
-  fetchFutureBookingsByCampgroundId
+  fetchFutureBookingsByCampgroundId,
 };
 
 export default BookingRepo;

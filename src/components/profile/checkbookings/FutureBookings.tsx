@@ -67,7 +67,7 @@ export default function FutureBookings({
                                   maxHeight: "25vh",
                                 }}
                               >
-                                {campground.author.username}
+                                {campground.bookings.username}
                               </div>
                               <div
                                 className="col "

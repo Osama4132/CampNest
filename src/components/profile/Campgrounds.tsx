@@ -6,10 +6,9 @@ export default function Campgrounds({
   fetchBookingsByCampground,
   setSelectedCampgroundID,
 }) {
+  console.log(campground);
   return (
     <>
-      {console.log(campground)}
-
       <div className="container d-flex flex-wrap my-5">
         <div className="card flex-row d-flex col-12 p-3 flex-wrap">
           <div className="col-lg-3 col-12">
@@ -73,7 +72,11 @@ export default function Campgrounds({
                     {campground.avgReviewRating}
                   </div>
                   <div className="col-4 col-lg fs-4">
-                    {campground.upcomingBookings}
+                    {campground.upcomingBookings === 1
+                      ? 0
+                      : campground.upcomingBookings === 2
+                      ? 1
+                      : 0}
                   </div>
                 </div>
               </div>

@@ -79,7 +79,7 @@ export async function seedCampgrounds() {
         title: `Title${i}`,
         location: `${cities[random].city}, ${cities[random].state}`,
         description: `${faker.company.catchPhraseDescriptor()}, ${faker.animal.bear()}`,
-        author: "672be9ae17b8c74e528497b3",
+        author: "674b993dfe05357a6e02957b",
         images: [
           {
             url: `https://picsum.photos/900?random=${Math.random()}`,
